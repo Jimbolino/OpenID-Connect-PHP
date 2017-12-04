@@ -23,6 +23,7 @@
 
 namespace Jimbolino;
 
+use phpseclib\Crypt\Random;
 use Exception;
 
 /**
@@ -419,7 +420,7 @@ class OpenIDConnectClient
      */
     protected function generateRandString()
     {
-        return md5(uniqid(rand(), true));
+        return md5(Random::string(32));
     }
 
     /**
