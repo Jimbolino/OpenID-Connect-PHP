@@ -85,6 +85,11 @@ class OpenIDConnectClient
     private $refreshToken;
 
     /**
+     * @var string the redirect url
+     */
+    private $redirectURL;
+
+    /**
      * @var string if we acquire an id token it will be stored here
      */
     private $idToken;
@@ -138,14 +143,8 @@ class OpenIDConnectClient
      */
     public function __construct($provider_url = null, $client_id = null, $client_secret = null)
     {
-        /**
-         * Use session to manage a nonce
-         */
-        if (!isset($_SESSION)) {
-            @session_start();
-        }
-
         self::checkRequirements();
+        static::startSession();
         $this->setProviderURL($provider_url);
         $this->clientID = $client_id;
         $this->clientSecret = $client_secret;
@@ -1174,7 +1173,7 @@ class OpenIDConnectClient
      */
     protected function setNonce($nonce)
     {
-        $_SESSION['openid_connect_nonce'] = $nonce;
+        static::setSession('openid_connect_nonce', $nonce);
         return $nonce;
     }
 
@@ -1185,7 +1184,7 @@ class OpenIDConnectClient
      */
     protected function getNonce()
     {
-        return $_SESSION['openid_connect_nonce'];
+        static::getSession('openid_connect_nonce');
     }
 
     /**
@@ -1195,7 +1194,7 @@ class OpenIDConnectClient
      */
     protected function unsetNonce()
     {
-        unset($_SESSION['openid_connect_nonce']);
+        static::unsetSession('openid_connect_nonce');
     }
 
     /**
@@ -1206,7 +1205,7 @@ class OpenIDConnectClient
      */
     protected function setState($state)
     {
-        $_SESSION['openid_connect_state'] = $state;
+        static::setSession('openid_connect_state', $state);
         return $state;
     }
 
@@ -1217,7 +1216,7 @@ class OpenIDConnectClient
      */
     protected function getState()
     {
-        return $_SESSION['openid_connect_state'];
+        return static::getSession('openid_connect_state');
     }
 
     /**
@@ -1227,7 +1226,46 @@ class OpenIDConnectClient
      */
     protected function unsetState()
     {
-        unset($_SESSION['openid_connect_state']);
+        static::unsetSession('openid_connect_state');
+    }
+
+    /**
+     * Set somthing in the session
+     * @param $key
+     * @param $value
+     */
+    protected function setSession($key, $value)
+    {
+        $_SESSION[$key] = $value;
+    }
+
+    /**
+     * Get somehting from the session
+     * @param $key
+     * @return mixed
+     */
+    protected function getSession($key)
+    {
+        return $_SESSION[$key];
+    }
+
+    /**
+     * Remove (unset) something from the session
+     * @param $key
+     */
+    protected function unsetSession($key)
+    {
+        unset($_SESSION[$key]);
+    }
+
+    /**
+     * Start a session if it is not started yet
+     */
+    protected function startSession()
+    {
+        if (session_id() === '') {
+            session_start();
+        }
     }
 
     /**
