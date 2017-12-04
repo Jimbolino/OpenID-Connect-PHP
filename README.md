@@ -14,7 +14,7 @@ A special thanks goes to Justin Richer and Amanda Anganes for their help and sup
 ## Install ##
  1. Install library using composer
 ```
-composer require jumbojett/openid-connect-php
+composer require jimbolino/openid-connect-php
 ```
  2. Include composer autoloader
 ```php
@@ -24,7 +24,7 @@ require '/vendor/autoload.php';
 ## Example 1: Basic Client ##
 
 ```php
-use Jumbojett\OpenIDConnectClient;
+use Jimbolino\OpenIDConnectClient;
 
 $oidc = new OpenIDConnectClient('https://id.provider.com',
                                 'ClientIDHere',
@@ -40,7 +40,7 @@ $name = $oidc->requestUserInfo('given_name');
 ## Example 2: Dynamic Registration ##
 
 ```php
-use Jumbojett\OpenIDConnectClient;
+use Jimbolino\OpenIDConnectClient;
 
 $oidc = new OpenIDConnectClient("https://id.provider.com");
 
@@ -63,7 +63,7 @@ $oidc->setCertPath("/path/to/my.cert");
 ## Example 4: Request Client Credentials Token ##
 
 ```php
-use Jumbojett\OpenIDConnectClient;
+use Jimbolino\OpenIDConnectClient;
 
 $oidc = new OpenIDConnectClient('https://id.provider.com',
                                 'ClientIDHere',
@@ -79,7 +79,7 @@ $clientCredentialsToken = $oidc->requestClientCredentialsToken()->access_token;
 ## Example 5: Request Resource Owners Token (with client auth) ##
 
 ```php
-use Jumbojett\OpenIDConnectClient;
+use Jimbolino\OpenIDConnectClient;
 
 $oidc = new OpenIDConnectClient('https://id.provider.com',
                                 'ClientIDHere',

@@ -21,7 +21,7 @@
  *
  */
 
-namespace Jumbojett;
+namespace Jimbolino;
 
 /**
  * Use session to manage a nonce
