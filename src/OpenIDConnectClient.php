@@ -717,15 +717,39 @@ class OpenIDConnectClient
                 $bit = '256';
             }
             $len = ((int)$bit)/16;
-            $expecte_at_hash = $this->urlEncode(substr(hash('sha'.$bit, $accessToken, true), 0, $len));
+            $expected_at_hash = $this->urlEncode(substr(hash('sha'.$bit, $accessToken, true), 0, $len));
         }
-        return (($claims->iss == $this->getProviderURL())
-            && (($claims->aud == $this->clientID) || (in_array($this->clientID, $claims->aud)))
-            && ($claims->nonce == $this->getNonce())
-            && (!isset($claims->exp) || $claims->exp >= time())
-            && (!isset($claims->nbf) || $claims->nbf <= time())
-            && (!isset($claims->at_hash) || $claims->at_hash == $expecte_at_hash)
-        );
+
+        if ($claims->iss !== $this->getProviderURL()) {
+            throw new Exception('iss does not match getProviderURL:'.$claims->iss.' !== '.$this->getProviderURL());
+        }
+
+        if ($claims->aud !== $this->clientID) {
+            if (!in_array($this->clientID, $claims->aud)) {
+                throw new Exception('aud does not match clientID:'.json_encode($claims->aud).' <> '.$this->clientID);
+            }
+        }
+
+        if ($claims->nonce !== $this->getNonce()) {
+            throw new Exception('nonce does not match getNonce:'.$claims->nonce.' !== '.$this->getNonce());
+        }
+        if (isset($claims->exp)) {
+            if ($claims->exp <= time()) {
+                throw new Exception('exp already:'.$claims->exp .' <= '.time());
+            }
+        }
+        if (isset($claims->nbf)) {
+            if ($claims->nbf >= time()) {
+                throw new Exception('nbf not yet:'.$claims->nbf .' >= '.time());
+            }
+        }
+        if (isset($claims->at_hash)) {
+            if ($claims->at_hash !== $expected_at_hash) {
+                throw new Exception('at_hash does not match expected_at_hash:'.$claims->at_hash.' !== '.$expected_at_hash);
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -1173,7 +1197,7 @@ class OpenIDConnectClient
      */
     protected function getNonce()
     {
-        static::getSession('openid_connect_nonce');
+        return static::getSession('openid_connect_nonce');
     }
 
     /**
